@@ -6,9 +6,12 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-g",
-                "${file}",
+                "${workspaceFolder}/src/main.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${workspaceFolder}/output",
+                "-lGL",
+                "-lSDL2",
+                "-lGLEW"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
