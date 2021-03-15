@@ -4,6 +4,8 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
+#include "shader.h"
+
 
 struct Vertex {
     float x;
@@ -52,6 +54,10 @@ int main() {
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+
+    // Define Shaders
+    Shader shader("shader/basic.vs", "shader/basic.fs");
+    shader.bind();
 
     // Main Loop
     bool run = true;
