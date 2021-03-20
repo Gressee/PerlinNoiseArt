@@ -34,21 +34,18 @@ int main() {
         return -1;
     }
 
-    // Define some vertecies
+    // Define some vertecies so that they fill the entire screen drawn as triangle strip
     Vertex vertecies[] = {
         Vertex{-1.0f, -1.0f, 0.0f},
-        Vertex{-0.0f, 1.0f, 0.0f},
-        Vertex{1.0f, -1.0f, 0.0f}
+        Vertex{-1.0f, 1.0f, 0.0f},
+        Vertex{1.0f, -1.0f, 0.0f},
+        Vertex{1.0f, 1.0f, 0.0f}
     };
-    uint32 numVertecies = 3;
+    uint32 numVertecies = 4;
 
-    GLuint vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, numVertecies * sizeof(Vertex), vertecies, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    // Define vertex buffer
+    VertexBuffer vertexBuffer(vertecies, numVertecies);
+    vertexBuffer.unbind();
 
     // Define Shaders
     Shader shader("shader/basic.vs", "shader/basic.fs");
@@ -67,11 +64,13 @@ int main() {
         }
 
         // Clear screen
-        glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw the image to the screen buffer
-        glDrawArrays(GL_TRIANGLES, 0, numVertecies);
+        vertexBuffer.bind();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, numVertecies);
+        vertexBuffer.unbind();
 
         // Swap the 2 buffers from dualbufferiing -> show to screen
         // Also waits for V-Sync
