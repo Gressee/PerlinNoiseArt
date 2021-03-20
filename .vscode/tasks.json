@@ -6,6 +6,7 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-g",
+                "-std=c++11",
                 "${workspaceFolder}/src/main.cpp",
                 "${workspaceFolder}/src/shader.cpp",
                 "-o",

@@ -4,14 +4,9 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
+#include "defines.h"
 #include "shader.h"
-
-
-struct Vertex {
-    float x;
-    float y;
-    float z;
-};
+#include "vertex_buffer.h"
 
 int main() {
 
@@ -28,7 +23,7 @@ int main() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create window
-    window = SDL_CreateWindow("Yaa Booii", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_OPENGL);
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
     // Init GLEW
@@ -45,7 +40,7 @@ int main() {
         Vertex{-0.0f, 1.0f, 0.0f},
         Vertex{1.0f, -1.0f, 0.0f}
     };
-    uint32_t numVertecies = 3;
+    uint32 numVertecies = 3;
 
     GLuint vertexBuffer;
     glGenBuffers(1, &vertexBuffer);
@@ -63,16 +58,6 @@ int main() {
     bool run = true;
     while(run) {
 
-        // Clear screen
-        glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Draw the 3 vertecies
-        glDrawArrays(GL_TRIANGLES, 0, numVertecies);
-
-        // IDK what this does
-        SDL_GL_SwapWindow(window);
-
         // Check quit
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
@@ -80,6 +65,18 @@ int main() {
                 run = false;
             }
         }
+
+        // Clear screen
+        glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Draw the image to the screen buffer
+        glDrawArrays(GL_TRIANGLES, 0, numVertecies);
+
+        // Swap the 2 buffers from dualbufferiing -> show to screen
+        // Also waits for V-Sync
+        SDL_GL_SwapWindow(window);
+
     }
 
     return 0;
