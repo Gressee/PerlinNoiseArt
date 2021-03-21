@@ -10,6 +10,10 @@ struct Shader {
 
     void bind();
     void unbind();
+    
+    GLuint getShaderId() {
+        return shaderId;
+    }
 
 private:
 

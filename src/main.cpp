@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #define GLEW_STATIC
 #include <GL/glew.h>
 #define SDL_MAIN_HANDLED
@@ -7,6 +8,10 @@
 #include "defines.h"
 #include "shader.h"
 #include "vertex_buffer.h"
+
+// Config values
+unsigned int screenWidth = 1600;
+unsigned int screenHeight = 900;
 
 int main() {
 
@@ -23,7 +28,7 @@ int main() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create window
-    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 600, 400, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
     // Init GLEW
@@ -51,6 +56,22 @@ int main() {
     Shader shader("shader/basic.vs", "shader/basic.fs");
     shader.bind();
 
+    // Init the uniforms
+    GLint screenDimUniformLocation = glGetUniformLocation(shader.getShaderId(), "screenDim");
+    GLint offsetUniformLocation = glGetUniformLocation(shader.getShaderId(), "offset");
+    if (screenDimUniformLocation == -1 || offsetUniformLocation == -1) {
+        std::cout << "uniform error" << std::endl;
+        return 0;
+    }
+
+    // Set the screenDim unifoem once
+    glUniform2f(screenDimUniformLocation, (float)screenWidth, (float)screenHeight);
+
+    // Init changing varibles for the animation
+    float animationTime = 0.0f;
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+
     // Main Loop
     bool run = true;
     while(run) {
@@ -62,6 +83,15 @@ int main() {
                 run = false;
             }
         }
+
+        // Claulate the animation
+        animationTime += 0.001;
+        offsetX = cos(animationTime);
+        offsetY = sin(animationTime);
+        std::cout << "X = " << offsetX << "\t\tY = " << offsetY << std::endl;
+
+        // Set the offset uniform to pass offset to frag shader
+        glUniform2f(offsetUniformLocation, offsetX, offsetY);
 
         // Clear screen
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
