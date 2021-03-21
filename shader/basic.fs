@@ -101,9 +101,14 @@ void main() {
     warpY = fractalNoise(viewportCoord + offset[1]);
     warpedPoint = vec2(warpX, warpY);
 
+    // Second warp
+    warpX = fractalNoise(warpedPoint + offset[0]);
+    warpY = fractalNoise(warpedPoint + offset[1]);
+    warpedPoint = vec2(warpX, warpY);
+
     // Final noise
     float val = fractalNoise(warpedPoint + offset * 5);
 
-    color = vec4(val, 1.0f - val, val, 1.0f);
+    color = vec4(val, val, val, 1.0f);
 
 }
