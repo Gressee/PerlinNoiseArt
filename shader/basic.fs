@@ -80,6 +80,8 @@ float fractalNoise(vec2 point) {
         amplitude *= 0.5;
     }
 
+    //noiseSum = 1 - abs(noiseSum);
+
     // Get the range to 0-1 from    amplitudeSum - amplitudeSum
     noiseSum = noiseSum/amplitudeSum * 0.5f + 0.5f;
 
