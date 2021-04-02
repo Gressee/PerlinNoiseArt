@@ -6,7 +6,9 @@ layout(location = 0) out vec4 color;
 // Get the uniform data
 uniform vec2 screenDim;
 uniform vec2 offset;
-
+uniform vec2 baseOffsetRed;
+uniform vec2 baseOffsetGreen;
+uniform vec2 baseOffsetBlue;
 
 
 // Noise Code from: https://github.com/keijiro/NoiseShader/blob/master/Assets/GLSL/ClassicNoise2D.glsl
@@ -65,6 +67,7 @@ float cnoise(vec2 P) {
 }
 
 
+// Produces the detailed noise
 float fractalNoise(vec2 point) {
     float noiseSum = 0;
     float amplitude = 1;
@@ -88,29 +91,57 @@ float fractalNoise(vec2 point) {
     return noiseSum;
 }
 
+
+// Produces warped noise from a point
+float warpPoint(vec2 samplePoint, vec2 baseOffset, vec2 offset, int warpNum) {
+  
+  // Init warp vars
+  float warpX = 0;
+  float warpY = 0;
+  vec2 warpedPoint = samplePoint;
+
+  for (int i = 0; i < warpNum; i++) {
+    warpX = fractalNoise(warpedPoint + offset[0] + baseOffset[0]);
+    warpY = fractalNoise(warpedPoint + offset[1] + baseOffset[1]);
+    warpedPoint = vec2(warpX, warpY);
+  }
+
+  float noise = fractalNoise(warpedPoint + offset + baseOffset[1]);
+
+  return noise;
+}
+
+vec4 mapColor(float val) {
+  // Maps a value in range (0, 1) to a color
+
+  float red = 2.0f*(val-0.5f);
+  float green = 0.5f*val;
+  float blue = abs(val-0.5f);
+  vec4 color = vec4(red, green, blue, 1.0f);
+  return color;
+}
+
 void main() {
-
-    // Get the coords of the fragment in (-1; 1) range
-    vec2 viewportCoord = vec2(((gl_FragCoord.x / screenDim[0]) - 0.5f) * 2 , ((gl_FragCoord.y / screenDim[1]) - 0.5f) * 2);
-
-    // Init warp vars
-    float warpX;
-    float warpY;
-    vec2 warpedPoint;
-
-    // First warp
-    warpX = fractalNoise(viewportCoord + offset[0]);
-    warpY = fractalNoise(viewportCoord + offset[1]);
-    warpedPoint = vec2(warpX, warpY);
-
-    // Second warp
-    warpX = fractalNoise(warpedPoint + offset[0]);
-    warpY = fractalNoise(warpedPoint + offset[1]);
-    warpedPoint = vec2(warpX, warpY);
-
-    // Final noise
-    float val = fractalNoise(warpedPoint + offset * 5);
-
-    color = vec4(val, val, val, 1.0f);
-
+    
+  // Get the coords of the fragment in (-1; 1) range
+  vec2 viewportCoord = vec2(((gl_FragCoord.x / screenDim[0]) - 0.5f) * 2 , ((gl_FragCoord.y / screenDim[1]) - 0.5f) * 2);
+  
+  float val = warpPoint(viewportCoord, vec2(0.0f, 0.0f), offset, 1);
+  color = mapColor(val);
+  /*
+  float r = warpPoint(viewportCoord, baseOffsetRed, offset, 1);
+  float g = warpPoint(viewportCoord, baseOffsetGreen, offset, 1);
+  float b = warpPoint(viewportCoord, baseOffsetBlue, offset, 1);
+  
+  
+  r = 1-r;
+  g = 1-g;
+  b = 1-b;
+  
+  r = r * 0.5f;// + 0.25f;
+  g = g * 0.5f;// + 0.25f;
+  b = b * 0.5f;// + 0.25f;
+  
+  color = vec4(r, g, b, 1.0f);
+  */
 }

@@ -12,6 +12,8 @@
 // Config values
 unsigned int screenWidth = 1600;
 unsigned int screenHeight = 900;
+float animationSpeed = 0.0005f;
+float baseOffsetValues[] = {20.0f, 10.0f, 50.0f};  // It's kind of a seed
 
 int main() {
 
@@ -59,13 +61,30 @@ int main() {
     // Init the uniforms
     GLint screenDimUniformLocation = glGetUniformLocation(shader.getShaderId(), "screenDim");
     GLint offsetUniformLocation = glGetUniformLocation(shader.getShaderId(), "offset");
-    if (screenDimUniformLocation == -1 || offsetUniformLocation == -1) {
+    GLint baseOffsetUniformLoactionRed = glGetUniformLocation(shader.getShaderId(), "baseOffsetRed");
+    GLint baseOffsetUniformLoactionGreen = glGetUniformLocation(shader.getShaderId(), "baseOffsetGreen");
+    GLint baseOffsetUniformLoactionBlue = glGetUniformLocation(shader.getShaderId(), "baseOffsetBlue");
+    if (screenDimUniformLocation == -1) std::cout << "screenDim\n";
+    if (offsetUniformLocation == -1) std::cout << "offset\n";
+    if (baseOffsetUniformLoactionRed == -1) std::cout << "Red\n";
+    if (baseOffsetUniformLoactionGreen == -1) std::cout << "Green\n";
+    if (baseOffsetUniformLoactionBlue == -1) std::cout << "Blue\n";
+    /*if (screenDimUniformLocation == -1
+    || offsetUniformLocation == -1
+    || baseOffsetUniformLoactionRed == -1
+    || baseOffsetUniformLoactionGreen == -1
+    || baseOffsetUniformLoactionBlue == -1) {
         std::cout << "uniform error" << std::endl;
         return 0;
-    }
+    }*/
 
-    // Set the screenDim unifoem once
+    // Set the screenDim uniform once
     glUniform2f(screenDimUniformLocation, (float)screenWidth, (float)screenHeight);
+
+    // Set base uniform offsets 
+    glUniform2f(baseOffsetUniformLoactionRed, baseOffsetValues[0], baseOffsetValues[1]);
+    glUniform2f(baseOffsetUniformLoactionBlue, baseOffsetValues[0], baseOffsetValues[2]);
+    glUniform2f(baseOffsetUniformLoactionGreen, baseOffsetValues[1], baseOffsetValues[2]);
 
     // Init changing varibles for the animation
     float animationTime = 0.0f;
@@ -85,10 +104,9 @@ int main() {
         }
 
         // Claulate the animation
-        animationTime += 0.001;
-        offsetX = cos(animationTime);
-        offsetY = sin(animationTime);
-        std::cout << "X = " << offsetX << "\t\tY = " << offsetY << std::endl;
+        animationTime += animationSpeed;
+        offsetX = cos(animationTime) * 5;
+        offsetY = sin(animationTime) * 5;
 
         // Set the offset uniform to pass offset to frag shader
         glUniform2f(offsetUniformLocation, offsetX, offsetY);
